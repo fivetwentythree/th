@@ -3,7 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
+  <title>Lochana Perera</title>
+  <meta name="description" content="Personal notes and thoughts by Lochana Perera">
+  
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Lochana Perera">
+  <meta property="og:description" content="Personal notes and thoughts">
+  <meta property="og:url" content="">
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Lochana Perera">
+  <meta name="twitter:description" content="Personal notes and thoughts">
+  
+  <!-- Canonical -->
+  <link rel="canonical" href="">
+  
+  <!-- RSS Feed -->
+  <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="feed.xml">
+  
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -13,25 +32,6 @@
     <nav id="nav"></nav>
   </div>
   <script src="config.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      // Build nav
-      document.getElementById("nav").innerHTML = `
-        <a href="index.html" class="name">${CONFIG.name}</a>
-        <a href="thoughts.html">Thoughts</a>
-      `;
-      
-      // Load homepage content
-      try {
-        const res = await fetch("content/index.md");
-        if (res.ok) {
-          const md = await res.text();
-          document.getElementById("content").innerHTML = marked.parse(md);
-        }
-      } catch (e) {
-        document.getElementById("content").innerHTML = "<p>Welcome.</p>";
-      }
-    });
-  </script>
+  <script src="js/home.js"></script>
 </body>
 </html>
