@@ -32,6 +32,7 @@ jobs:
         run: |
           cp -r content dist/
           cp -r images dist/ 2>/dev/null || true
+          cp -r fonts dist/ 2>/dev/null || true
           cp robots.txt dist/
           cp config.js dist/
       
