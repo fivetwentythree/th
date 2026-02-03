@@ -1,0 +1,293 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1a1a1b;
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+.layout {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 40px;
+}
+
+.content {
+  max-width: 650px;
+}
+
+nav {
+  text-align: right;
+  position: sticky;
+  top: 32px;
+  align-self: flex-start;
+}
+
+nav .name {
+  display: block;
+  color: #000;
+  font-size: 14px;
+  margin-bottom: 4px;
+  text-decoration: none;
+}
+
+nav .name:hover {
+  text-decoration: underline;
+}
+
+nav a {
+  display: block;
+  color: #2962ff;
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+nav a.active {
+  color: #000;
+}
+
+p {
+  margin-bottom: 16px;
+}
+
+strong {
+  font-weight: 600;
+}
+
+em {
+  font-style: italic;
+}
+
+a {
+  color: #2962ff;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  max-width: 300px;
+  height: auto;
+  display: block;
+  margin: 8px 0;
+  border-radius: 4px;
+}
+
+ul, ol {
+  margin: 0 0 16px 20px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+/* Reddit-style threaded comments */
+.thread {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.thread li {
+  position: relative;
+  padding-left: 20px;
+  padding-bottom: 12px;
+}
+
+/* Vertical line */
+.thread li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #edeff1;
+}
+
+/* Curved connector */
+.thread li::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  width: 12px;
+  height: 10px;
+  border-left: 2px solid #edeff1;
+  border-bottom: 2px solid #edeff1;
+  border-bottom-left-radius: 8px;
+  background: transparent;
+}
+
+/* First item - dot instead of curve */
+.thread > li:first-child::after {
+  border: none;
+  width: 5px;
+  height: 5px;
+  background: #d0d0d0;
+  border-radius: 50%;
+  top: 6px;
+  left: 2px;
+}
+
+.thread > li:first-child::before {
+  top: 14px;
+}
+
+/* Last item - stop vertical line */
+.thread li:last-child::before {
+  bottom: auto;
+  height: 10px;
+}
+
+/* Nested threads */
+.thread .thread {
+  margin-top: 10px;
+  margin-left: 0;
+}
+
+/* Nested dot */
+.thread .thread > li:first-child::after {
+  width: 4px;
+  height: 4px;
+  top: 6px;
+}
+
+.thread .thread > li:first-child::before {
+  top: 12px;
+}
+
+/* Content styling */
+.thread p {
+  margin: 0 0 6px 0;
+  line-height: 1.55;
+}
+
+.thread p:last-child {
+  margin-bottom: 0;
+}
+
+.thread li.highlight {
+  background: linear-gradient(90deg, #fff9c4 0%, transparent 100%);
+  margin-left: -12px;
+  padding-left: 32px;
+  border-left: 3px solid #ffd54f;
+  transition: background 1s ease, border-color 1s ease;
+}
+
+/* Search */
+.search-container {
+  margin-bottom: 32px;
+  position: relative;
+}
+
+#search {
+  width: 200px;
+  padding: 6px 0;
+  font-size: 14px;
+  font-family: inherit;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  background: transparent;
+  outline: none;
+  transition: width 0.2s ease, border-color 0.2s ease;
+}
+
+#search::placeholder {
+  color: #aaa;
+  font-style: italic;
+}
+
+#search:focus {
+  width: 100%;
+  border-color: #1a1a1b;
+}
+
+#search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  margin-top: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+#search-results:empty {
+  display: none;
+}
+
+.search-item {
+  display: block;
+  padding: 10px 14px;
+  color: #1a1a1b;
+  text-decoration: none;
+  font-size: 13px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.search-item:last-child {
+  border-bottom: none;
+}
+
+.search-item:hover {
+  background: #fafafa;
+}
+
+.search-cat {
+  display: inline-block;
+  font-size: 11px;
+  margin-right: 8px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Backlinks */
+.backlinks {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #edeff1;
+  font-size: 13px;
+  color: #666;
+}
+
+.backlinks a {
+  color: #2962ff;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column-reverse;
+    padding: 20px;
+  }
+  
+  nav {
+    text-align: left;
+    position: static;
+    margin-bottom: 32px;
+  }
+  
+  .content {
+    max-width: 100%;
+  }
+}
