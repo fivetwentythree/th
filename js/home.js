@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   
   // Load homepage content
   try {
-    const res = await fetch(`${basePath}content/index.md`);
+    const res = await fetch(`${basePath}content/index.md?v=${Date.now()}`);
     if (res.ok) {
       const md = await res.text();
       document.getElementById("content").innerHTML = marked.parse(md);

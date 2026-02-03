@@ -24,7 +24,7 @@ function generateId(text) {
 async function fetchContent(cat) {
   if (contentCache[cat]) return contentCache[cat];
   try {
-    const res = await fetch(`${basePath}content/thoughts/${cat}.md`);
+    const res = await fetch(`${basePath}content/thoughts/${cat}.md?v=${Date.now()}`);
     if (res.ok) {
       const md = await res.text();
       contentCache[cat] = md;
@@ -217,7 +217,7 @@ async function init() {
   const [category, scrollToId] = hash.split(':');
   
   try {
-    const res = await fetch(`${basePath}content/thoughts/_index.md`);
+    const res = await fetch(`${basePath}content/thoughts/_index.md?v=${Date.now()}`);
     if (res.ok) {
       const text = await res.text();
       categoriesCache = text.trim().split("\n").filter(c => c.trim());
