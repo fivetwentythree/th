@@ -1,4 +1,4 @@
 ideas
 work
 life
-Test 
+test 
