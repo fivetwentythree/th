@@ -1,3 +1,3 @@
-const CONFIG = {
+window.CONFIG = {
   name: "Lochana Perera"
 };
