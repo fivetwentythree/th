@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: './', // Relative paths for GitHub Pages
+  base: '/th/', // GitHub Pages subdirectory
   build: {
     outDir: 'dist',
     rollupOptions: {

@@ -33,6 +33,7 @@ jobs:
           cp -r content dist/
           cp -r images dist/ 2>/dev/null || true
           cp robots.txt dist/
+          cp config.js dist/
       
       - uses: actions/upload-pages-artifact@v3
         with:

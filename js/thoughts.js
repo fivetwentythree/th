@@ -1,4 +1,5 @@
 const name = CONFIG.name;
+const basePath = CONFIG.basePath || '/';
 let allContent = [];
 let fuse = null;
 let contentCache = {};
@@ -23,7 +24,7 @@ function generateId(text) {
 async function fetchContent(cat) {
   if (contentCache[cat]) return contentCache[cat];
   try {
-    const res = await fetch(`content/thoughts/${cat}.md`);
+    const res = await fetch(`${basePath}content/thoughts/${cat}.md`);
     if (res.ok) {
       const md = await res.text();
       contentCache[cat] = md;
@@ -163,7 +164,7 @@ function scrollToThought(id) {
 async function renderCategory(category, scrollToId, categories) {
   const nav = document.getElementById("nav");
   nav.innerHTML = `
-    <a href="index.html" class="name">${name}</a>
+    <a href="${basePath}index.html" class="name">${name}</a>
     ${categories.map(c => 
       `<a href="#${c}" class="${c === category ? 'active' : ''}">${c.charAt(0).toUpperCase() + c.slice(1)}</a>`
     ).join("")}
@@ -216,7 +217,7 @@ async function init() {
   const [category, scrollToId] = hash.split(':');
   
   try {
-    const res = await fetch("content/thoughts/_index.md");
+    const res = await fetch(`${basePath}content/thoughts/_index.md`);
     if (res.ok) {
       const text = await res.text();
       categoriesCache = text.trim().split("\n").filter(c => c.trim());

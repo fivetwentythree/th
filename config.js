@@ -1,3 +1,4 @@
 window.CONFIG = {
-  name: "Lochana Perera"
+  name: "Lochana Perera",
+  basePath: "/th/"
 };

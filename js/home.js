@@ -1,13 +1,15 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  const basePath = CONFIG.basePath || '/';
+  
   // Build nav
   document.getElementById("nav").innerHTML = `
-    <a href="index.html" class="name">${CONFIG.name}</a>
-    <a href="thoughts.html">Thoughts</a>
+    <a href="${basePath}index.html" class="name">${CONFIG.name}</a>
+    <a href="${basePath}thoughts.html">Thoughts</a>
   `;
   
   // Load homepage content
   try {
-    const res = await fetch("content/index.md");
+    const res = await fetch(`${basePath}content/index.md`);
     if (res.ok) {
       const md = await res.text();
       document.getElementById("content").innerHTML = marked.parse(md);
