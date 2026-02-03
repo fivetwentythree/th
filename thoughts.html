@@ -18,6 +18,7 @@
     const name = CONFIG.name;
     let allContent = [];
     let fuse = null;
+    let contentCache = {}; // Cache fetched markdown files
     
     // Convert [[wikilinks]] to actual links
     function parseWikiLinks(md) {
@@ -34,14 +35,28 @@
         .slice(0, 30);
     }
     
-    // Load all content for search
+    // Fetch with cache
+    async function fetchContent(cat) {
+      if (contentCache[cat]) return contentCache[cat];
+      try {
+        const res = await fetch(`content/thoughts/${cat}.md`);
+        if (res.ok) {
+          const md = await res.text();
+          contentCache[cat] = md;
+          return md;
+        }
+      } catch (e) {}
+      return null;
+    }
+    
+    // Load all content for search (parallel fetches)
     async function loadAllContent(categories) {
       allContent = [];
-      for (const cat of categories) {
-        try {
-          const res = await fetch(`content/thoughts/${cat}.md`);
-          if (res.ok) {
-            const md = await res.text();
+      const results = await Promise.all(categories.map(fetchContent));
+      
+      categories.forEach((cat, i) => {
+        const md = results[i];
+        if (md) {
             
             // Also index the full category content for broad searches
             const fullText = md
@@ -84,8 +99,7 @@
               }
             }
           }
-        } catch (e) {}
-      }
+      });
       fuse = new Fuse(allContent, {
         keys: ['text'],
         threshold: 0.6,
@@ -96,22 +110,13 @@
       });
     }
     
-    // Find backlinks
-    async function findBacklinks(categories, currentCategory) {
-      const backlinks = [];
-      for (const cat of categories) {
-        if (cat === currentCategory) continue;
-        try {
-          const res = await fetch(`content/thoughts/${cat}.md`);
-          if (res.ok) {
-            const md = await res.text();
-            if (md.toLowerCase().includes(`[[${currentCategory}]]`)) {
-              backlinks.push(cat);
-            }
-          }
-        } catch (e) {}
-      }
-      return backlinks;
+    // Find backlinks (uses cache from loadAllContent)
+    function findBacklinks(categories, currentCategory) {
+      return categories.filter(cat => {
+        if (cat === currentCategory) return false;
+        const md = contentCache[cat];
+        return md && md.toLowerCase().includes(`[[${currentCategory}]]`);
+      });
     }
     
     function renderSearch() {
@@ -179,19 +184,23 @@
       const nav = document.getElementById("nav");
       
       // Load categories
-      let categories = [];
       try {
         const res = await fetch("content/thoughts/_index.md");
         if (res.ok) {
           const text = await res.text();
-          categories = text.trim().split("\n").filter(c => c.trim());
+          categoriesCache = text.trim().split("\n").filter(c => c.trim());
         }
       } catch (e) {}
       
-      // Load search index
-      await loadAllContent(categories);
+      // Load search index (parallel fetch of all categories)
+      await loadAllContent(categoriesCache);
       
-      // Build nav
+      // Render the current category
+      renderCategory(category, scrollToId, categoriesCache);
+    });
+    
+    async function renderCategory(category, scrollToId, categories) {
+      const nav = document.getElementById("nav");
       nav.innerHTML = `
         <a href="index.html" class="name">${name}</a>
         ${categories.map(c => 
@@ -200,37 +209,40 @@
       `;
       
       if (category) {
-        try {
-          const res = await fetch(`content/thoughts/${category}.md`);
-          if (res.ok) {
-            let md = await res.text();
-            md = parseWikiLinks(md);
-            let html = marked.parse(md);
-            html = html.replace(/<ul>/g, '<ul class="thread">');
-            html = addIdsToHtml(html);
-            
-            const backlinks = await findBacklinks(categories, category);
-            if (backlinks.length > 0) {
-              html += `<div class="backlinks"><strong>Linked from:</strong> ${backlinks.map(b => 
-                `<a href="#${b}">${b.charAt(0).toUpperCase() + b.slice(1)}</a>`
-              ).join(" · ")}</div>`;
-            }
-            
-            document.getElementById("content").innerHTML = renderSearch() + html;
-            setupSearch();
-            
-            if (scrollToId) {
-              setTimeout(() => scrollToThought(scrollToId), 150);
-            }
+        const md = contentCache[category];
+        if (md) {
+          let parsed = parseWikiLinks(md);
+          let html = marked.parse(parsed);
+          html = html.replace(/<ul>/g, '<ul class="thread">');
+          html = addIdsToHtml(html);
+          
+          const backlinks = findBacklinks(categories, category);
+          if (backlinks.length > 0) {
+            html += `<div class="backlinks"><strong>Linked from:</strong> ${backlinks.map(b => 
+              `<a href="#${b}">${b.charAt(0).toUpperCase() + b.slice(1)}</a>`
+            ).join(" · ")}</div>`;
           }
-        } catch (e) {}
+          
+          document.getElementById("content").innerHTML = renderSearch() + html;
+          setupSearch();
+          
+          if (scrollToId) {
+            setTimeout(() => scrollToThought(scrollToId), 150);
+          }
+        }
       } else {
         document.getElementById("content").innerHTML = renderSearch() + "<p>Select a category →</p>";
         setupSearch();
       }
-    });
+    }
     
-    window.addEventListener("hashchange", () => location.reload());
+    let categoriesCache = [];
+    
+    window.addEventListener("hashchange", () => {
+      const hash = window.location.hash.slice(1);
+      const [category, scrollToId] = hash.split(':');
+      renderCategory(category, scrollToId, categoriesCache);
+    });
   </script>
 </body>
 </html>
