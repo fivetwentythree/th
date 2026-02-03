@@ -96,7 +96,7 @@ li {
   margin-bottom: 8px;
 }
 
-/* Reddit-style threaded comments */
+/* Minimal threaded comments with curves */
 .thread {
   list-style: none;
   margin: 0;
@@ -105,7 +105,7 @@ li {
 
 .thread li {
   position: relative;
-  padding-left: 20px;
+  padding-left: 18px;
   padding-bottom: 12px;
 }
 
@@ -113,45 +113,34 @@ li {
 .thread li::before {
   content: "";
   position: absolute;
-  left: 4px;
+  left: 0;
   top: 0;
   bottom: 0;
-  width: 2px;
-  background: #edeff1;
+  width: 1px;
+  background: #ddd;
 }
 
 /* Curved connector */
 .thread li::after {
   content: "";
   position: absolute;
-  left: 4px;
+  left: 0;
   top: 0;
-  width: 12px;
+  width: 10px;
   height: 10px;
-  border-left: 2px solid #edeff1;
-  border-bottom: 2px solid #edeff1;
-  border-bottom-left-radius: 8px;
+  border-left: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-bottom-left-radius: 6px;
   background: transparent;
 }
 
-/* First item - dot instead of curve */
-.thread > li:first-child::after {
-  border: none;
-  width: 5px;
-  height: 5px;
-  background: #d0d0d0;
-  border-radius: 50%;
-  top: 6px;
-  left: 2px;
-}
-
+/* First item */
 .thread > li:first-child::before {
-  top: 14px;
+  top: 10px;
 }
 
-/* Last item - stop vertical line */
+/* Last item */
 .thread li:last-child::before {
-  bottom: auto;
   height: 10px;
 }
 
@@ -161,33 +150,16 @@ li {
   margin-left: 0;
 }
 
-/* Nested dot */
-.thread .thread > li:first-child::after {
-  width: 4px;
-  height: 4px;
-  top: 6px;
-}
-
-.thread .thread > li:first-child::before {
-  top: 12px;
-}
-
 /* Content styling */
 .thread p {
-  margin: 0 0 6px 0;
-  line-height: 1.55;
-}
-
-.thread p:last-child {
-  margin-bottom: 0;
+  margin: 0;
+  line-height: 1.6;
 }
 
 .thread li.highlight {
-  background: linear-gradient(90deg, #fff9c4 0%, transparent 100%);
-  margin-left: -12px;
-  padding-left: 32px;
-  border-left: 3px solid #ffd54f;
-  transition: background 1s ease, border-color 1s ease;
+  background: #f9f9f9;
+  margin-left: -8px;
+  padding-left: 26px;
 }
 
 /* Search */
