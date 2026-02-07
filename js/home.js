@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const basePath = CONFIG.basePath || '/';
+  const basePath = import.meta?.env?.BASE_URL || CONFIG.basePath || '/';
   
   // Build nav
   document.getElementById("nav").innerHTML = `

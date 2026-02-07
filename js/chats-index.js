@@ -1,4 +1,4 @@
-const basePath = CONFIG.basePath || '/';
+const basePath = import.meta?.env?.BASE_URL || CONFIG.basePath || '/';
 const listEl = document.querySelector('[data-chat-list]');
 const nav = document.getElementById('nav');
 

@@ -6,6 +6,7 @@ const contentDir = path.join(root, 'content', 'chats');
 const distDir = path.join(root, 'dist', 'chats');
 const rootChatsDir = path.join(root, 'chats');
 const sourceHtmlPath = path.join(root, 'chats.html');
+const distHtmlPath = path.join(root, 'dist', 'chats.html');
 
 function ensureDir(dir) {
   if (!fs.existsSync(dir)) {
@@ -22,17 +23,23 @@ function getSlugs() {
     .filter((slug) => slug && slug.toLowerCase() !== 'readme' && slug.toLowerCase() !== '_index');
 }
 
-function buildHtmlTemplate(slug) {
-  const sourceHtml = fs.readFileSync(sourceHtmlPath, 'utf-8');
-  let html = sourceHtml;
-
-  html = html.replace(/href="style\.css"/g, 'href="../style.css"');
-  html = html.replace(/href="chat\.css"/g, 'href="../chat.css"');
-  html = html.replace(/src="config\.js"/g, 'src="../config.js"');
-  html = html.replace(/src="js\/chats\.js"/g, 'src="../js/chats.js"');
+function buildHtmlTemplate(slug, template, { dist }) {
+  let html = template;
+  html = html.replace(/href="feed\.xml"/g, 'href="../feed.xml"');
+  if (dist) {
+    html = html.replace(/src="config\.js"/g, 'src="../config.js"');
+  } else {
+    html = html.replace(/href="style\.css"/g, 'href="../style.css"');
+    html = html.replace(/href="chat\.css"/g, 'href="../chat.css"');
+    html = html.replace(/src="config\.js"/g, 'src="../config.js"');
+    html = html.replace(/src="js\/chats\.js"/g, 'src="../js/chats.js"');
+  }
 
   const slugScript = `<script>window.CHAT_SLUG = "${slug}";<\/script>`;
-  html = html.replace(/<script src="\.\.\/config\.js"><\/script>/, `${slugScript}\n  <script src="../config.js"></script>`);
+  html = html.replace(
+    /<script src="[^"]*config\.js"><\/script>/,
+    `${slugScript}\n  <script src="${dist ? '../config.js' : '../config.js'}"></script>`
+  );
 
   return html;
 }
@@ -48,13 +55,19 @@ function generatePages() {
   }
 
   const indexItems = [];
-  slugs.forEach((slug) => {
-    const html = buildHtmlTemplate(slug);
-    const outputPath = path.join(distDir, `${slug}.html`);
-    fs.writeFileSync(outputPath, html);
+  const sourceTemplate = fs.readFileSync(sourceHtmlPath, 'utf-8');
+  const distTemplate = fs.existsSync(distHtmlPath)
+    ? fs.readFileSync(distHtmlPath, 'utf-8')
+    : sourceTemplate;
 
+  slugs.forEach((slug) => {
+    const distHtml = buildHtmlTemplate(slug, distTemplate, { dist: true });
+    const outputPath = path.join(distDir, `${slug}.html`);
+    fs.writeFileSync(outputPath, distHtml);
+
+    const devHtml = buildHtmlTemplate(slug, sourceTemplate, { dist: false });
     const devOutputPath = path.join(rootChatsDir, `${slug}.html`);
-    fs.writeFileSync(devOutputPath, html);
+    fs.writeFileSync(devOutputPath, devHtml);
 
     const filePath = path.join(contentDir, `${slug}.md`);
     let title = slug;

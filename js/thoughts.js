@@ -1,5 +1,5 @@
 const name = CONFIG.name;
-const basePath = CONFIG.basePath || '/';
+  const basePath = import.meta?.env?.BASE_URL || CONFIG.basePath || '/';
 let allContent = [];
 let fuse = null;
 let contentCache = {};

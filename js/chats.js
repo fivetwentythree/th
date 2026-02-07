@@ -1,4 +1,4 @@
-const basePath = CONFIG.basePath || '/';
+const basePath = import.meta?.env?.BASE_URL || CONFIG.basePath || '/';
 
 function getInitials(name) {
   if (!name) return 'LL';
