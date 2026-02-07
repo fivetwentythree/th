@@ -103,6 +103,7 @@ body.chat-page {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  display: none;
 }
 
 .author {
@@ -696,15 +697,15 @@ body.chat-page {
   }
 
   .bubble {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .thinking-toggle {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .thinking-content {
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .block-link {
@@ -712,12 +713,46 @@ body.chat-page {
   }
 
   .markdown table {
-    min-width: 640px;
-    font-size: 13px;
+    min-width: 100%;
+    font-size: 14px;
+    border-collapse: collapse;
   }
 
   .markdown th,
   .markdown td {
-    padding: 10px 12px 10px 0;
+    padding: 8px 0;
+  }
+
+  .markdown thead {
+    display: none;
+  }
+
+  .markdown tbody,
+  .markdown tr,
+  .markdown td {
+    display: block;
+    width: 100%;
+  }
+
+  .markdown tbody tr {
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+  }
+
+  .markdown tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .markdown td {
+    border-bottom: none;
+  }
+
+  .markdown td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    margin-bottom: 4px;
   }
 }

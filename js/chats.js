@@ -218,19 +218,42 @@ function markdownToHtml(raw) {
     return output;
   }
 
-  function renderInlineTable(table) {
-    const headerHtml = table.headers
-      .map((cell) => `<th>${formatInline(cell)}</th>`)
+  function stripInlineText(value) {
+    return String(value || '')
+      .replace(/@@BR@@/g, ' ')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/(^|[^*])\*([^*]+)\*/g, '$1$2')
+      .replace(/(^|[^_])_([^_]+)_/g, '$1$2')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function renderTableHtml(headers, rows, aligns = []) {
+    const headerHtml = headers
+      .map((cell, index) => {
+        const align = aligns[index] || 'left';
+        return `<th style="text-align:${align}">${formatInline(cell)}</th>`;
+      })
       .join('');
-    const bodyHtml = table.rows
+    const bodyHtml = rows
       .map((row) => {
         const cells = row
-          .map((cell) => `<td>${formatInline(cell)}</td>`)
+          .map((cell, index) => {
+            const align = aligns[index] || 'left';
+            const label = stripInlineText(headers[index] || '');
+            return `<td style="text-align:${align}" data-label="${escapeAttribute(label)}">${formatInline(cell)}</td>`;
+          })
           .join('');
         return `<tr>${cells}</tr>`;
       })
       .join('');
     return `<div class="table-wrap"><table><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div>`;
+  }
+
+  function renderInlineTable(table) {
+    return renderTableHtml(table.headers, table.rows);
   }
 
   const lines = text.split('\n');
@@ -362,24 +385,7 @@ function markdownToHtml(raw) {
         bodyRows.push(splitTableRow(lines[i]));
         i += 1;
       }
-      const headerHtml = headerCells
-        .map((cell, index) => {
-          const align = alignCells[index] || 'left';
-          return `<th style="text-align:${align}">${formatInline(cell)}</th>`;
-        })
-        .join('');
-      const bodyHtml = bodyRows
-        .map((row) => {
-          const cells = row
-            .map((cell, index) => {
-              const align = alignCells[index] || 'left';
-              return `<td style="text-align:${align}">${formatInline(cell)}</td>`;
-            })
-            .join('');
-          return `<tr>${cells}</tr>`;
-        })
-        .join('');
-      html.push(`<div class="table-wrap"><table><thead><tr>${headerHtml}</tr></thead><tbody>${bodyHtml}</tbody></table></div>`);
+      html.push(renderTableHtml(headerCells, bodyRows, alignCells));
       continue;
     }
 
