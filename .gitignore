@@ -3,3 +3,4 @@ dist/
 .DS_Store
 content/chats/_index.json
 chats/*.html
+!chats/index.html
