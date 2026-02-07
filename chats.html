@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chats - Lochana Perera</title>
+  <meta name="description" content="LLM chat transcripts by Lochana Perera">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Chats - Lochana Perera">
+  <meta property="og:description" content="LLM chat transcripts">
+  <meta property="og:url" content="https://fivetwentythree.github.io/th/chats.html">
+  <meta property="og:image" content="https://fivetwentythree.github.io/th/images/og-image.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Chats - Lochana Perera">
+  <meta name="twitter:description" content="LLM chat transcripts">
+  <meta name="twitter:image" content="https://fivetwentythree.github.io/th/images/og-image.png">
+
+  <link rel="canonical" href="">
+  <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="feed.xml">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="chat.css">
+</head>
+<body class="chat-page">
+  <div class="layout chat-layout">
+    <main class="content chat-content">
+      <div class="chat-app">
+        <div class="chat-view">
+          <section class="thread">
+            <div class="thread-header">
+              <div class="thread-title-row">
+                <h1 class="thread-title" data-thread-title></h1>
+              </div>
+              <div class="thread-meta">
+                <a class="author" href="#">
+                  <span class="avatar" data-author-initials>LP</span>
+                  <span class="author-name" data-author-name></span>
+                  <span class="dot" data-author-dot>•</span>
+                  <span class="author-handle" data-author-handle></span>
+                </a>
+                <button class="btn icon star" type="button" data-action="star" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.12 2.12 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.12 2.12 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.12 2.12 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.12 2.12 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.12 2.12 0 0 0 1.597-1.16z"
+                    ></path>
+                  </svg>
+                  <span class="count" data-star-count>0</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="thread-body">
+              <aside class="jump-nav" data-jump-nav></aside>
+              <div class="messages" data-message-list></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <nav id="nav"></nav>
+  </div>
+  <div class="toast-container" data-toasts></div>
+  <script src="config.js"></script>
+  <script type="module" src="js/chats.js"></script>
+</body>
+</html>

@@ -9,8 +9,21 @@ function generateSitemap() {
   
   const urls = [
     { loc: SITE_URL, priority: '1.0' },
-    { loc: `${SITE_URL}/thoughts.html`, priority: '0.9' }
+    { loc: `${SITE_URL}/thoughts.html`, priority: '0.9' },
+    { loc: `${SITE_URL}/chats/index.html`, priority: '0.9' }
   ];
+
+  const chatsDir = path.join(process.cwd(), 'content/chats');
+  if (fs.existsSync(chatsDir)) {
+    const chatFiles = fs.readdirSync(chatsDir).filter(file => file.endsWith('.md'));
+    for (const file of chatFiles) {
+      const slug = file.replace(/\.md$/, '');
+      urls.push({
+        loc: `${SITE_URL}/chats/${slug}.html`,
+        priority: '0.8'
+      });
+    }
+  }
   
   if (fs.existsSync(indexPath)) {
     const categories = fs.readFileSync(indexPath, 'utf-8')

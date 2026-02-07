@@ -7,7 +7,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        thoughts: 'thoughts.html'
+        thoughts: 'thoughts.html',
+        chats: 'chats.html',
+        chatsIndex: 'chats/index.html'
       }
     },
     minify: 'terser',

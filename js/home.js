@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("nav").innerHTML = `
     <a href="${basePath}index.html" class="name">${CONFIG.name}</a>
     <a href="${basePath}thoughts.html">Thoughts</a>
+    <a href="${basePath}chats/index.html">Chats</a>
   `;
   
   // Load homepage content

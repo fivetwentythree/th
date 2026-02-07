@@ -165,6 +165,7 @@ async function renderCategory(category, scrollToId, categories) {
   const nav = document.getElementById("nav");
   nav.innerHTML = `
     <a href="${basePath}index.html" class="name">${name}</a>
+    <a href="${basePath}chats/index.html">Chats</a>
     ${categories.map(c => 
       `<a href="#${c}" class="${c === category ? 'active' : ''}">${c.charAt(0).toUpperCase() + c.slice(1)}</a>`
     ).join("")}
