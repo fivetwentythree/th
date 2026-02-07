@@ -34,6 +34,8 @@ body.chat-page {
 .chat-content {
   max-width: none;
   width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .chat-app {
@@ -46,6 +48,8 @@ body.chat-page {
   display: flex;
   flex: 1;
   position: relative;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .btn {
@@ -270,6 +274,8 @@ body.chat-page {
   display: flex;
   gap: 8px;
   align-items: flex-start;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .bubble {
@@ -281,6 +287,8 @@ body.chat-page {
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .message.assistant .bubble {
@@ -326,6 +334,8 @@ body.chat-page {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .tool-header {
@@ -516,6 +526,7 @@ body.chat-page {
   font-family: var(--font-mono);
   font-size: 12px;
   overflow-x: auto;
+  max-width: 100%;
 }
 
 .markdown pre code {
