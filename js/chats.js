@@ -205,6 +205,12 @@ function markdownToHtml(raw) {
 
   function formatInline(value) {
     let output = value;
+    const mathSegments = [];
+    output = output.replace(/(\$\$[\s\S]+?\$\$|\$[^$\n]+?\$)/g, (match) => {
+      const id = mathSegments.length;
+      mathSegments.push(match);
+      return `@@MATH${id}@@`;
+    });
     output = output.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, url) => {
       return `<a href="${escapeAttribute(url)}" target="_blank" rel="noopener noreferrer">${label}</a>`;
     });
@@ -215,6 +221,9 @@ function markdownToHtml(raw) {
       return `<code>${escapeHtml(inlineCodes[Number(id)])}</code>`;
     });
     output = output.replace(/@@BR@@/g, '<br>');
+    output = output.replace(/@@MATH(\d+)@@/g, (_, id) => {
+      return mathSegments[Number(id)] || '';
+    });
     return output;
   }
 
@@ -419,6 +428,25 @@ function markdownToHtml(raw) {
   return html.join('');
 }
 
+function slugify(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+}
+
+function ensureUniqueId(base, usedIds) {
+  let candidate = base || 'section';
+  let counter = 1;
+  while (usedIds.has(candidate)) {
+    counter += 1;
+    candidate = `${base}-${counter}`;
+  }
+  usedIds.add(candidate);
+  return candidate;
+}
+
 function renderDiffLines(diffText) {
   return diffText
     .split('\n')
@@ -540,19 +568,52 @@ function renderBlock(block) {
   return '';
 }
 
+function decorateJumpTargets() {
+  const usedIds = new Set();
+  document.querySelectorAll('[id]').forEach((node) => {
+    if (node.id) usedIds.add(node.id);
+  });
+
+  const jumpBlocks = blocks.filter((block) => block.jump);
+  jumpBlocks.forEach((block, index) => {
+    const node = document.getElementById(block.id);
+    if (!node) return;
+    const labelSource =
+      block.text || block.title || block.command || `Message ${index + 1}`;
+    node.dataset.jumpLabel = labelSource;
+    node.dataset.jumpType = 'block';
+
+    const headings = node.querySelectorAll('.markdown h3, .markdown h4');
+    headings.forEach((heading) => {
+      const headingText = (heading.textContent || '').trim();
+      if (!headingText) return;
+      const base =
+        heading.id || `${block.id}-${slugify(headingText) || 'section'}`;
+      const uniqueId = ensureUniqueId(base, usedIds);
+      heading.id = uniqueId;
+      heading.dataset.jumpLabel = headingText;
+      heading.dataset.jumpType = heading.tagName.toLowerCase();
+    });
+  });
+}
+
+function getJumpTargets() {
+  return Array.from(document.querySelectorAll('[data-jump-label]'));
+}
+
 function renderJumpNav() {
-  const jumpTargets = blocks.filter((block) => block.jump);
+  const jumpTargets = getJumpTargets();
   jumpNav.innerHTML = jumpTargets
-    .map((block, index) => {
-      const labelSource =
-        block.text || block.title || block.command || `Message ${index + 1}`;
+    .map((target, index) => {
+      const labelSource = target.dataset.jumpLabel || `Section ${index + 1}`;
       const label =
         labelSource.length > 48
           ? `${labelSource.slice(0, 45)}...`
           : labelSource;
       const safeLabel = escapeHtml(label);
+      const type = target.dataset.jumpType || 'section';
       return `
-        <button type="button" data-target="${block.id}" aria-label="Jump to message ${index + 1}">
+        <button type="button" data-target="${target.id}" data-jump-type="${type}" aria-label="Jump to ${type} ${index + 1}">
           <span class="dot"></span>
           <span class="line"></span>
           <span class="jump-label">${index + 1}. ${safeLabel}</span>
@@ -769,7 +830,7 @@ function observeBlocks() {
   if (jumpObserver) {
     jumpObserver.disconnect();
   }
-  const jumpTargets = blocks.filter((block) => block.jump);
+  const jumpTargets = getJumpTargets();
   const buttonMap = new Map();
 
   document.querySelectorAll('[data-target]').forEach((btn) => {
@@ -790,9 +851,22 @@ function observeBlocks() {
     { rootMargin: '-40% 0px -50% 0px' }
   );
 
-  jumpTargets.forEach((block) => {
-    const node = document.getElementById(block.id);
+  jumpTargets.forEach((target) => {
+    const node = document.getElementById(target.id);
     if (node) jumpObserver.observe(node);
+  });
+}
+
+function renderMath() {
+  if (typeof window.renderMathInElement !== 'function') return;
+  const container = document.querySelector('.messages');
+  if (!container) return;
+  window.renderMathInElement(container, {
+    delimiters: [
+      { left: '$$', right: '$$', display: true },
+      { left: '$', right: '$', display: false },
+    ],
+    throwOnError: false,
   });
 }
 
@@ -810,7 +884,9 @@ async function bootstrap() {
   await loadTranscript();
   fillThreadHeader();
   initMessages();
+  decorateJumpTargets();
   renderJumpNav();
+  renderMath();
   bindInteractions();
   observeBlocks();
 }
