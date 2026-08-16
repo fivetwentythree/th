@@ -23,6 +23,19 @@ function getSlugs() {
     .filter((slug) => slug && slug.toLowerCase() !== 'readme' && slug.toLowerCase() !== '_index');
 }
 
+function plainText(markdown) {
+  return markdown
+    .replace(/^#\s+.+$/gm, '')
+    // Keep code searchable while dropping only Markdown's code-fence markers.
+    .replace(/```[^\n]*\n?([\s\S]*?)```/g, '$1')
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/[>*_`#]/g, ' ')
+    .replace(/\$+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function buildHtmlTemplate(slug, template, { dist }) {
   let html = template;
   html = html.replace(/href="feed\.xml"/g, 'href="../feed.xml"');
@@ -71,15 +84,22 @@ function generatePages() {
 
     const filePath = path.join(contentDir, `${slug}.md`);
     let title = slug;
+    let content = '';
     try {
-      const content = fs.readFileSync(filePath, 'utf-8');
+      content = fs.readFileSync(filePath, 'utf-8');
       const match = content.match(/^#\s+(.+)$/m);
       if (match) {
         title = match[1].trim();
       }
     } catch (error) {}
 
-    indexItems.push({ slug, title });
+    const searchText = plainText(content);
+    indexItems.push({
+      slug,
+      title,
+      excerpt: searchText.slice(0, 180),
+      searchText,
+    });
   });
 
   const indexJson = {

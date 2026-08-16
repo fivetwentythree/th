@@ -31,12 +31,26 @@
           <h1>Chats</h1>
           <p>All chat transcripts exported from LLM sessions.</p>
         </header>
+        <div class="search-container" data-chat-search>
+          <input
+            type="search"
+            id="search"
+            placeholder="Search chats..."
+            autocomplete="off"
+            aria-label="Search chat transcripts"
+            aria-autocomplete="list"
+            aria-controls="search-results"
+            aria-expanded="false"
+          >
+          <div id="search-results" role="listbox" aria-live="polite"></div>
+        </div>
         <div class="chat-list-grid" data-chat-list></div>
       </div>
     </main>
     <nav id="nav"></nav>
   </div>
   <script src="../config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
   <script type="module" src="../js/chats-index.js"></script>
 </body>
 </html>

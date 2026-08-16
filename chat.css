@@ -348,6 +348,30 @@ body.chat-page {
   font-size: 12px;
 }
 
+.chat-search-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+}
+
+.chat-search-title {
+  font-weight: 500;
+}
+
+.chat-search-excerpt {
+  display: block;
+  flex-basis: 100%;
+  margin-top: 3px;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+
+.chat-search-item:focus-visible {
+  outline: 2px solid #2962ff;
+  outline-offset: -2px;
+}
+
 @media (min-width: 640px) {
   .thread-header {
     align-items: center;
