@@ -228,6 +228,13 @@ body.chat-page {
   padding: 0;
 }
 
+.math-display {
+  margin: 8px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 .markdown .table-wrap {
   overflow-x: auto;
   margin: 10px 0 14px;

@@ -284,6 +284,23 @@ function markdownToHtml(raw) {
       continue;
     }
 
+    if (trimmed === '$$') {
+      let end = i + 1;
+      while (end < lines.length && lines[end].trim() !== '$$') {
+        end += 1;
+      }
+
+      if (end < lines.length) {
+        flushParagraph();
+        closeList();
+        closeBlockquote();
+        const expression = lines.slice(i + 1, end).join('\n').trim();
+        html.push(`<div class="math-display">$$${expression}$$</div>`);
+        i = end + 1;
+        continue;
+      }
+    }
+
     const codeMatch = trimmed.match(/^@@CODEBLOCK_(\d+)@@$/);
     if (codeMatch) {
       flushParagraph();
