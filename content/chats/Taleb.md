@@ -4,12 +4,6 @@
 
 ---
 
-## Assistant
-
-more_vert
-User 2:08 PM
-
----
 
 ## Assistant
 
