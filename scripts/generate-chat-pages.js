@@ -36,6 +36,36 @@ function plainText(markdown) {
     .trim();
 }
 
+function getSearchSections(markdown) {
+  const cleaned = markdown.replace(/\r\n/g, '\n').trim();
+  const headingMatches = [...cleaned.matchAll(/^##\s+(.+)$/gm)];
+
+  return headingMatches.flatMap((match, index) => {
+    const end =
+      index + 1 < headingMatches.length ? headingMatches[index + 1].index : cleaned.length;
+    const content = cleaned
+      .slice(match.index + match[0].length, end)
+      .replace(/\n\s*---\s*\n/g, '\n')
+      .split('\n')
+      .filter((line) => {
+        const trimmed = line.trim();
+        return !/^Expand to view model thoughts/i.test(trimmed) && !/^chevron_right/i.test(trimmed);
+      })
+      .join('\n')
+      .trim();
+
+    if (!content) return [];
+
+    const searchText = plainText(content);
+    return [{
+      id: index,
+      title: match[1].trim(),
+      excerpt: searchText.slice(0, 180),
+      searchText,
+    }];
+  });
+}
+
 function buildHtmlTemplate(slug, template, { dist }) {
   let html = template;
   html = html.replace(/href="feed\.xml"/g, 'href="../feed.xml"');
@@ -93,12 +123,10 @@ function generatePages() {
       }
     } catch (error) {}
 
-    const searchText = plainText(content);
     indexItems.push({
       slug,
       title,
-      excerpt: searchText.slice(0, 180),
-      searchText,
+      sections: getSearchSections(content),
     });
   });
 

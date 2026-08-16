@@ -67,16 +67,24 @@ function clearSearchResults() {
   setSearchExpanded(false);
 }
 
-function excerptFor(item, matches) {
-  const text = item.searchText || item.excerpt || '';
-  const textMatch = matches.find((match) => match.key === 'searchText');
-  if (!textMatch) return item.excerpt || text.slice(0, 180);
+function excerptFor(section, textMatch) {
+  const text = section?.searchText || section?.excerpt || '';
+  if (!textMatch) return section?.excerpt || text.slice(0, 180);
   const matchStart = textMatch?.indices?.[0]?.[0] ?? 0;
   const start = Math.max(0, matchStart - 72);
   const end = Math.min(text.length, matchStart + 148);
   const prefix = start > 0 ? '…' : '';
   const suffix = end < text.length ? '…' : '';
   return `${prefix}${text.slice(start, end).trim()}${suffix}`;
+}
+
+function matchingSection(item, matches) {
+  const sections = Array.isArray(item.sections) ? item.sections : [];
+  const textMatch = matches.find((match) => match.key === 'sections.searchText');
+  const titleMatch = matches.find((match) => match.key === 'sections.title');
+  const match = textMatch || titleMatch;
+  const section = Number.isInteger(match?.refIndex) ? sections[match.refIndex] : sections[0];
+  return { section, textMatch };
 }
 
 function renderSearchResults(matches) {
@@ -89,17 +97,20 @@ function renderSearchResults(matches) {
   }
 
   searchResults.innerHTML = matches.map(({ item, matches: fuseMatches = [] }, index) => {
-    const excerpt = excerptFor(item, fuseMatches);
+    const { section, textMatch } = matchingSection(item, fuseMatches);
+    const excerpt = excerptFor(section, textMatch);
+    const hash = Number.isInteger(section?.id) ? `#chat-section-${section.id}` : '';
     return `
       <a
         id="chat-search-result-${index}"
         class="search-item chat-search-item"
-        href="${basePath}chats/${encodeURIComponent(item.slug)}.html"
+        href="${basePath}chats/${encodeURIComponent(item.slug)}.html${hash}"
         role="option"
         aria-selected="false"
       >
         <span class="search-cat">Chat</span>
         <span class="chat-search-title">${escapeHtml(item.title || item.slug)}</span>
+        ${section?.title ? `<span class="chat-search-section">${escapeHtml(section.title)}</span>` : ''}
         ${excerpt ? `<span class="chat-search-excerpt">${escapeHtml(excerpt)}</span>` : ''}
       </a>
     `;
@@ -112,8 +123,9 @@ function setupSearch(items) {
 
   const fuse = new Fuse(items, {
     keys: [
-      { name: 'title', weight: 0.65 },
-      { name: 'searchText', weight: 0.35 },
+      { name: 'title', weight: 0.25 },
+      { name: 'sections.title', weight: 0.2 },
+      { name: 'sections.searchText', weight: 0.55 },
     ],
     threshold: 0.3,
     ignoreLocation: true,

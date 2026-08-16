@@ -422,7 +422,7 @@ function renderBlock(block) {
     const isAssistant = block.role === 'assistant';
     const rendered = markdownToHtml(block.text);
     return `
-      <div class="block message-block">
+      <div id="chat-section-${block.sourceIndex}" class="block message-block" tabindex="-1">
         <div class="message ${isAssistant ? 'assistant' : ''}">
           <span class="avatar ${isAssistant ? 'assistant' : 'user'}"></span>
           <section class="bubble markdown">${rendered}</section>
@@ -435,7 +435,7 @@ function renderBlock(block) {
     const expanded = block.expanded === true;
     const rendered = markdownToHtml(block.content);
     return `
-      <div class="block thinking-block">
+      <div id="chat-section-${block.sourceIndex}" class="block thinking-block" tabindex="-1">
         <button class="thinking-toggle" type="button" data-toggle="thinking" aria-expanded="${expanded}">
           ${icons.chevron}
           <span>${block.title}</span>
@@ -490,6 +490,7 @@ function parseTranscript(raw) {
         title: 'Thinking',
         content,
         expanded: false,
+        sourceIndex: index,
       });
       return;
     }
@@ -502,6 +503,7 @@ function parseTranscript(raw) {
       type: 'message',
       role: isUser ? 'user' : 'assistant',
       text: content,
+      sourceIndex: index,
     });
   });
 
@@ -558,6 +560,26 @@ function initMessages() {
   messageList.innerHTML = blocks.map(renderBlock).join('');
 }
 
+function scrollToSearchSection() {
+  const match = window.location.hash.match(/^#chat-section-(\d+)$/);
+  if (!match) return;
+
+  const section = document.getElementById(`chat-section-${match[1]}`);
+  if (!section) return;
+
+  const toggle = section.querySelector('[data-toggle="thinking"]');
+  if (toggle?.getAttribute('aria-expanded') === 'false') {
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.nextElementSibling?.removeAttribute('hidden');
+  }
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  section.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
+  section.focus({ preventScroll: true });
+  section.classList.add('search-highlight');
+  window.setTimeout(() => section.classList.remove('search-highlight'), 2200);
+}
+
 function bindInteractions() {
   document.addEventListener('click', (event) => {
     const thinkingBtn = event.target.closest('[data-toggle=\'thinking\']');
@@ -603,6 +625,7 @@ async function bootstrap() {
   initMessages();
   renderMath();
   bindInteractions();
+  scrollToSearchSection();
 }
 
 document.addEventListener('DOMContentLoaded', bootstrap);
