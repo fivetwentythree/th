@@ -43,7 +43,7 @@ function markdownToHtml(raw) {
   // Remove Google AI Studio's copied code-toolbar text when it appears directly
   // before a fenced block. Keeping this in the renderer cleans existing and
   // future exports without altering the original transcripts.
-  text = text.replace(/^code.*?downloadcontent_copyexpand_less\s*\n(?=```)/gim, '');
+  text = text.replace(/^[ \t]*code.*?downloadcontent_copyexpand_less\s*\n(?=```)/gim, '');
   text = text.replace(/<br\s*\/?>/gi, '@@BR@@');
   const inlineTables = [];
 
