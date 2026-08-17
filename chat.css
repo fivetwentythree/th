@@ -223,6 +223,42 @@ body.chat-page {
   max-width: 100%;
 }
 
+.code-block {
+  position: relative;
+  margin: 8px 0;
+}
+
+.markdown .code-block pre {
+  margin: 0;
+  padding-top: 38px;
+}
+
+.code-copy {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  z-index: 1;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 7px;
+  background: #fff;
+  color: var(--muted-foreground);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.code-copy:hover {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+.code-copy:focus-visible {
+  outline: 2px solid #2962ff;
+  outline-offset: 2px;
+}
+
 .markdown pre code {
   background: transparent;
   padding: 0;

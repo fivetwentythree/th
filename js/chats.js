@@ -40,6 +40,10 @@ function escapeAttribute(value) {
 function markdownToHtml(raw) {
   const source = raw || '';
   let text = source.replace(/\r\n/g, '\n');
+  // Remove Google AI Studio's copied code-toolbar text when it appears directly
+  // before a fenced block. Keeping this in the renderer cleans existing and
+  // future exports without altering the original transcripts.
+  text = text.replace(/^code.*?downloadcontent_copyexpand_less\s*\n(?=```)/gim, '');
   text = text.replace(/<br\s*\/?>/gi, '@@BR@@');
   const inlineTables = [];
 
@@ -311,7 +315,10 @@ function markdownToHtml(raw) {
       const block = codeBlocks[Number(codeMatch[1])];
       const langClass = block.lang ? `language-${block.lang}` : '';
       html.push(
-        `<pre><code class="${langClass}">${escapeHtml(block.code)}</code></pre>`
+        `<div class="code-block">
+          <button class="code-copy" type="button" data-copy-code aria-label="Copy code to clipboard">Copy</button>
+          <pre><code class="${langClass}">${escapeHtml(block.code)}</code></pre>
+        </div>`
       );
       i += 1;
       continue;
@@ -562,6 +569,35 @@ function initMessages() {
   messageList.innerHTML = blocks.map(renderBlock).join('');
 }
 
+async function copyCode(button) {
+  const code = button.closest('.code-block')?.querySelector('code')?.textContent;
+  if (!code) return;
+
+  const originalLabel = button.textContent;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(code);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = code;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.append(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      if (!copied) throw new Error('Copy command failed');
+    }
+    button.textContent = 'Copied';
+  } catch (error) {
+    button.textContent = 'Unable to copy';
+  }
+
+  window.setTimeout(() => {
+    button.textContent = originalLabel;
+  }, 1600);
+}
+
 function getSearchQuery() {
   return new URLSearchParams(window.location.search).get('q')?.trim() || '';
 }
@@ -648,6 +684,12 @@ function scrollToSearchSection() {
 
 function bindInteractions() {
   document.addEventListener('click', (event) => {
+    const copyButton = event.target.closest('[data-copy-code]');
+    if (copyButton) {
+      copyCode(copyButton);
+      return;
+    }
+
     const thinkingBtn = event.target.closest('[data-toggle=\'thinking\']');
     if (thinkingBtn) {
       const expanded = thinkingBtn.getAttribute('aria-expanded') === 'true';
