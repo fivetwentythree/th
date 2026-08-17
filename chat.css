@@ -383,6 +383,11 @@ body.chat-page {
   box-shadow: 0 0 0 6px #f3f6ff;
 }
 
+::highlight(chat-search-match) {
+  background: #ffe58a;
+  color: #000;
+}
+
 @media (min-width: 640px) {
   .thread-header {
     align-items: center;

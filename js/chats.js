@@ -16,6 +16,8 @@ const icons = {
   chevron: `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18l6-6l-6-6"></path></svg>`,
 };
 
+const SEARCH_HIGHLIGHT_NAME = 'chat-search-match';
+
 const messageList = document.querySelector('[data-message-list]');
 const nav = document.getElementById('nav');
 
@@ -560,6 +562,66 @@ function initMessages() {
   messageList.innerHTML = blocks.map(renderBlock).join('');
 }
 
+function getSearchQuery() {
+  return new URLSearchParams(window.location.search).get('q')?.trim() || '';
+}
+
+function findTextRanges(container, query) {
+  if (!query) return [];
+
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      return node.data ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    },
+  });
+  const textNodes = [];
+  let combinedText = '';
+  let node;
+
+  while ((node = walker.nextNode())) {
+    const start = combinedText.length;
+    combinedText += node.data;
+    textNodes.push({ node, start, end: combinedText.length });
+  }
+
+  const pattern = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+');
+  const matcher = new RegExp(pattern, 'gi');
+  const ranges = [];
+  let match;
+
+  while ((match = matcher.exec(combinedText)) && ranges.length < 20) {
+    const start = match.index;
+    const end = start + match[0].length;
+    const startNode = textNodes.find((entry) => start >= entry.start && start < entry.end);
+    const endNode = textNodes.find((entry) => end > entry.start && end <= entry.end);
+    if (!startNode || !endNode) continue;
+
+    const range = document.createRange();
+    range.setStart(startNode.node, start - startNode.start);
+    range.setEnd(endNode.node, end - endNode.start);
+    ranges.push(range);
+  }
+
+  return ranges;
+}
+
+function highlightTextRanges(ranges) {
+  if (typeof Highlight !== 'function' || !CSS.highlights) return;
+  CSS.highlights.set(SEARCH_HIGHLIGHT_NAME, new Highlight(...ranges));
+}
+
+function scrollToRange(range) {
+  const rect = range.getBoundingClientRect();
+  if (!rect.height && !rect.width) return false;
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({
+    top: Math.max(0, window.scrollY + rect.top - window.innerHeight / 2 + rect.height / 2),
+    behavior: reducedMotion ? 'auto' : 'smooth',
+  });
+  return true;
+}
+
 function scrollToSearchSection() {
   const match = window.location.hash.match(/^#chat-section-(\d+)$/);
   if (!match) return;
@@ -573,8 +635,12 @@ function scrollToSearchSection() {
     toggle.nextElementSibling?.removeAttribute('hidden');
   }
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  section.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
+  const ranges = findTextRanges(section, getSearchQuery());
+  highlightTextRanges(ranges);
+  if (!ranges.length || !scrollToRange(ranges[0])) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    section.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
+  }
   section.focus({ preventScroll: true });
   section.classList.add('search-highlight');
   window.setTimeout(() => section.classList.remove('search-highlight'), 2200);

@@ -87,7 +87,7 @@ function matchingSection(item, matches) {
   return { section, textMatch };
 }
 
-function renderSearchResults(matches) {
+function renderSearchResults(matches, query) {
   if (!searchResults) return;
 
   if (!matches.length) {
@@ -100,11 +100,12 @@ function renderSearchResults(matches) {
     const { section, textMatch } = matchingSection(item, fuseMatches);
     const excerpt = excerptFor(section, textMatch);
     const hash = Number.isInteger(section?.id) ? `#chat-section-${section.id}` : '';
+    const searchQuery = `?q=${encodeURIComponent(query)}`;
     return `
       <a
         id="chat-search-result-${index}"
         class="search-item chat-search-item"
-        href="${basePath}chats/${encodeURIComponent(item.slug)}.html${hash}"
+        href="${basePath}chats/${encodeURIComponent(item.slug)}.html${searchQuery}${hash}"
         role="option"
         aria-selected="false"
       >
@@ -140,7 +141,7 @@ function setupSearch(items) {
       return;
     }
 
-    renderSearchResults(fuse.search(query, { limit: MAX_SEARCH_RESULTS }));
+    renderSearchResults(fuse.search(query, { limit: MAX_SEARCH_RESULTS }), query);
   };
   const debouncedSearch = debounce(search, SEARCH_DEBOUNCE_MS);
   cancelPendingSearch = debouncedSearch.cancel;
