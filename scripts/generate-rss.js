@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const SITE_URL = 'https://fivetwentythree.github.io/th';
+const SITE_URL = 'https://think.lochana.au';
   const SITE_TITLE = 'Lochana Perera';
 const SITE_DESCRIPTION = 'Personal notes and thoughts';
 

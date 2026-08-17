@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const SITE_URL = 'https://fivetwentythree.github.io/th';
+const SITE_URL = 'https://think.lochana.au';
 
 function generateSitemap() {
   const thoughtsDir = path.join(process.cwd(), 'content/thoughts');
