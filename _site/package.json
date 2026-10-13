@@ -1,0 +1,14 @@
+{
+  "name": "notes",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "build": "vite build && node scripts/generate-chat-pages.js && node scripts/generate-rss.js && node scripts/generate-sitemap.js",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "terser": "^5.27.0"
+  }
+}
